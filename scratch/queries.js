@@ -7,10 +7,12 @@ const Note = require('../models/note');
 function testQueries() {
   const queries = [
     // findAndSearch(),
-    // findById('000000000000000000000002'),
-    createNote(),
-    findAndUpdate(),
-    findAndRemove()
+    // createNote()
+    // findById('000000000000000000000002')
+    // findAndUpdate('5ba1566686d6ed45d030e4d9')
+    findAndRemove('5ba1566686d6ed45d030e4d9'),
+    findById('5ba1566686d6ed45d030e4d9')
+
   ];
 
   
@@ -26,10 +28,9 @@ function findAndSearch() {
     filter.title = { $regex: searchTerm, $options: '-i'};
   }
 
-  Note.find(filter).sort({ updatedAt: 'desc' })
+  return Note.find(filter).sort({ updatedAt: 'desc' })
     .then(results => {
       console.log(results);
-      return;
     });
 }
 
@@ -39,16 +40,18 @@ function findById(id) {
 }
 
 function createNote() {
-
-  Note.create({title: 'foo', content: 'bar'})
+  return Note.create({title: 'foo', content: 'bar'})
+    .then(result => console.log(result));
 }
 
 function findAndUpdate(id) {
-
+  return Note.findByIdAndUpdate(id, {title: 'updated title'}, {new: true})
+    .then(result => console.log(result));
 }
 
 function findAndRemove(id) {
-
+  return Note.findByIdAndRemove(id)
+    .then(() => console.log('deleted ' + id));
 }
 
 mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
