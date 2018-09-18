@@ -10,9 +10,8 @@ function testQueries() {
     // createNote()
     // findById('000000000000000000000002')
     // findAndUpdate('5ba1566686d6ed45d030e4d9')
-    findAndRemove('5ba1566686d6ed45d030e4d9'),
-    findById('5ba1566686d6ed45d030e4d9')
-
+    findAndUpdate('5ba155cffeb22e8c6cf7965a'),
+    findById('5ba155cffeb22e8c6cf7965a')
   ];
 
   

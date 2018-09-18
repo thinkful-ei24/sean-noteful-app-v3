@@ -52,10 +52,12 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
     console.error(err);
   });
 
-app.listen(PORT, function () {
-  console.info(`Server listening on ${this.address().port}`);
-}).on('error', err => {
-  console.error(err);
-});
+if(process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, function () {
+    console.info(`Server listening on ${this.address().port}`);
+  }).on('error', err => {
+    console.error(err);
+  });
+}
 
 module.exports = app; // Export for testing
