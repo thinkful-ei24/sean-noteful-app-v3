@@ -30,7 +30,8 @@ router.get('/', (req, res, next) => {
   Note.find(filter).sort({ updatedAt: 'desc' })
     .then(results => {
       res.json(results);
-    });
+    })
+    .catch(err => next(err));
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
@@ -53,7 +54,8 @@ router.post('/', (req, res, next) => {
   Note.create({title, content})
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
-    }).catch(err => next(err));
+    })
+    .catch(err => next(err));
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
