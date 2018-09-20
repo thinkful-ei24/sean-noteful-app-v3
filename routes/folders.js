@@ -5,12 +5,10 @@ const Folder = require('../models/folder');
 
 const router = express.Router();
 
-function validateFolderInput() {
-  return;
-}
+const mongoose = require('mongoose');
 
 router.get('/', (req, res, next) => {
-  Folder.find()
+  Folder.find().sort('asc')
     .then(results => {
       res.json(results);
     })
@@ -18,25 +16,35 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id', (req, res, next) => {
-  Folder.findById(req.params.id)
+  const {id} = req.params;
+
+  Folder.findOne({_id: id})
     .then(result => {
-      res.json(result);
+      return res.json(result);
     })
     .catch(err => next(err));
 });
 
 router.put('/:id', (req, res, next) => {
   const {name} = req.body;
-  const err = validateFolderInput(name);
-  if(err) {
+  if(!name) {
+    const err = new Error('Folder name not specified');
+    err.status = 400;
     return next(err);
   }
+
+  Folder.findByIdAndUpdate(req.params.id, {name}, {new: true})
+    .then(result => {
+      return res.json(result);
+    })
+    .catch(err => next(err));
 });
 
 router.post('/', (req, res, next) => {
   const {name} = req.body;
-  const err = validateFolderInput(name);
-  if(err) {
+  if(!name) {
+    const err = new Error('Folder name not specified');
+    err.status = 400;
     return next(err);
   }
 

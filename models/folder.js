@@ -1,6 +1,6 @@
-const moongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-const folderSchema = new moongoose.Schema({
+const folderSchema = new mongoose.Schema({
   name: {type: String, required: true, unique: true}
 });
 
@@ -18,4 +18,4 @@ folderSchema.set('toObject', {
   }
 });
 
-module.exports = moongoose.model('Folder', folderSchema);
+module.exports = mongoose.model('Folder', folderSchema);

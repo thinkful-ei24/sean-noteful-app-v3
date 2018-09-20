@@ -1,5 +1,5 @@
 
-// FIX... fundamentally flawed in its use
+// FIX... lots of duplicate code but this isn't a great abstractino
 
 // accepts an array of required field names
 // further args to the function are the names checked against the array
