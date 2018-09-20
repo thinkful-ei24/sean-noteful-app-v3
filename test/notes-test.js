@@ -117,10 +117,6 @@ describe('Test notes API', function() {
         });
     });
 
-    // it('should not accept very large payloads', function() {
-
-    // });
-
     // it('should not accept many notes being added in a short timespan', function() {
 
     // });
@@ -163,12 +159,11 @@ describe('Test notes API', function() {
           expect(res.body.content).to.equal(newData.content);
 
           return Note.findById(itemToUpdate.id);
+        })
+        .then(dbRes => {
+          // TODO
         });
     });
-
-    // it('should not accept very large payloads', function() {
-
-    // });
 
     // it('should throttle note updates if too many are being changed at once', function() {
 
@@ -192,13 +187,6 @@ describe('Test notes API', function() {
         })
         .then(dbRes => {
           expect(dbRes).to.be.null;
-        });
-    });
-
-    it('should give a 404 if no id is specified', function() {
-      return chai.request(app).delete('/api/notes')
-        .then(res => {
-          expect(res).to.have.status(404);
         });
     });
   });
