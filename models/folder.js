@@ -1,9 +1,10 @@
 const moongoose = require('mongoose');
 
 const folderSchema = new moongoose.Schema({
-  name: {type: String, required: true, unique: true},
-  timestamps: true
+  name: {type: String, required: true, unique: true}
 });
+
+folderSchema.set('timestamps', true);
 
 folderSchema.virtual('id').get(function() {
   return this._id;
