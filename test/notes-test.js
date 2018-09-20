@@ -46,7 +46,7 @@ describe('Test notes API', function() {
   });
 
   describe('GET /api/notes/:id', function() {
-    it('should return correct note (GET /api/notes/:id/', function () {
+    it('should return correct note (GET /api/notes/:id', function () {
       let data;
       // 1) First, call the database
       return Note.findOne()
@@ -127,11 +127,11 @@ describe('Test notes API', function() {
     // it('should fail when no id is specified', function() {
 
     // });
-
+    
     // it('should fail when the body id does not match the param id', function () {
-
+    
     // });
-
+    
     // 1. grab existing entry from db
     // 2. request that the item be updated through the API
     // 3. check that the network call returned new data
