@@ -2,19 +2,15 @@
 
 const express = require('express');
 
+const utils = require('../utils/server-utils.js');
+
 const Note = require('../models/note');
 
 const router = express.Router();
 
-function validateInput(title, content) {
-  const requiredFields = ['title', 'content'];
-  requiredFields.forEach(field => {
-    if(!field) {
-      const err = new Error(`Missing field '${field}' in req body`);
-      err.status = 400;
-      return err;
-    }
-  });
+function validateNoteInput(title, content) {
+  // TODO
+  return;
 }
 
 /* ========== GET/READ ALL ITEMS ========== */
@@ -46,7 +42,7 @@ router.get('/:id', (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
   const {title, content} = req.body;
-  const err = validateInput(title, content);
+  const err = validateNoteInput(title, content);
   if(err) {
     return next(err);
   }
@@ -61,7 +57,7 @@ router.post('/', (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
   const {title, content} = req.body;
-  const err = validateInput(title, content);
+  const err = validateNoteInput(title, content);
   if(err) {
     return next(err);
   }

@@ -1,0 +1,20 @@
+
+// FIX... fundamentally flawed in its use
+
+// accepts an array of required field names
+// further args to the function are the names checked against the array
+// ignores: extra fields that aren't required
+// returns: an error stating one missing field that was found
+// function validateInput(reqFields) {
+//   const argLookup = new Set(arguments.slice(1));
+
+//   reqFields.forEach(field => {
+//     if(!argLookup.has(field)) {
+//       const err = new Error(`Missing field '${field}' in req body`);
+//       err.status = 400;
+//       return err;
+//     }
+//   });
+// }
+
+// module.exports = { validateInput };
