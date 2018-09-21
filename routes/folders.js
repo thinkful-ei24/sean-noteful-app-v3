@@ -8,7 +8,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 
 router.get('/', (req, res, next) => {
-  Folder.find().sort('asc')
+  Folder.find().sort({name: 'desc'})
     .then(results => {
       res.json(results);
     })

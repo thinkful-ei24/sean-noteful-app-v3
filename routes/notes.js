@@ -9,8 +9,16 @@ const Note = require('../models/note');
 const router = express.Router();
 
 function validateNoteInput(title, content) {
-  // TODO
-  return;
+  let err;
+  if(!title) {
+    err = new Error('Missing `title` in request body');
+    err.status = 400;
+  } else if (!content) {
+    err = new Error('Missing `content` in request body');
+    err.status = 400;
+  }
+  
+  return err;
 }
 
 /* ========== GET/READ ALL ITEMS ========== */
