@@ -1,4 +1,6 @@
 
+const mongoose = require('mongoose');
+
 // FIX... lots of duplicate code but this isn't a great abstractino
 
 // accepts an array of required field names
@@ -16,5 +18,3 @@
 //     }
 //   });
 // }
-
-// module.exports = { validateInput };

@@ -2,28 +2,42 @@
 
 const express = require('express');
 
-const utils = require('../utils/server-utils.js');
+const mongoose = require('mongoose');
 
 const Note = require('../models/note');
 
 const router = express.Router();
 
-function validateNoteInput(title, content) {
+function validateNoteInput(title, content, tags) {
   let err;
+
   if(!title) {
     err = new Error('Missing `title` in request body');
     err.status = 400;
-  } else if (!content) {
-    err = new Error('Missing `content` in request body');
-    err.status = 400;
+    return err;
   }
   
-  return err;
+  if (!content) {
+    err = new Error('Missing `content` in request body');
+    err.status = 400;
+    return err;
+  }
+
+  console.log(tags);
+  if(tags) {
+    for(let tagId of tags) {
+      if(!mongoose.Types.ObjectId.isValid(tagId)) {
+        const err = new Error('A tag id is not valid');
+        err.status = 400;
+        return err;
+      }
+    }
+  }
 }
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  const {searchTerm, folderId} = req.query;
+  const {searchTerm, folderId, tagId} = req.query;
   let filter = {};
 
   if(searchTerm) {
@@ -35,7 +49,13 @@ router.get('/', (req, res, next) => {
     filter.folderId = folderId;
   }
 
+  if(tagId) {
+    filter.tagId = tagId;
+  }
+
   Note.find(filter).sort({ updatedAt: 'desc' })
+    .populate('tags')
+    .populate('folderId')
     .then(results => {
       res.json(results);
     })
@@ -44,7 +64,10 @@ router.get('/', (req, res, next) => {
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
+
   Note.findById(req.params.id)
+    .populate('tags')
+    .populate('folderId')
     .then(result => {
       return res.json(result);
     })
@@ -53,8 +76,8 @@ router.get('/:id', (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
-  const {title, content} = req.body;
-  const err = validateNoteInput(title, content);
+  const {title, content, tags} = req.body;
+  const err = validateNoteInput(title, content, tags);
   if(err) {
     return next(err);
   }
