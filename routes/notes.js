@@ -76,13 +76,20 @@ router.get('/:id', (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
-  const {title, content, tags} = req.body;
+  const {title, content, folderId, tags} = req.body;
   const err = validateNoteInput(title, content, tags);
   if(err) {
     return next(err);
   }
 
-  Note.create({title, content})
+  const newNote = {
+    title,
+    content,
+    folderId: folderId ? folderId : null,
+    tags: tags ? tags : []
+  };
+
+  Note.create(newNote)
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })

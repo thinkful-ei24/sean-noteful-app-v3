@@ -6,8 +6,10 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Folder = require('../models/folder');
+const Note = require('../models/note');
 
 const { folders } = require('../db/seed/folders');
+const notes = require('../db/seed/notes');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -19,7 +21,11 @@ describe('Test folders API endpoints', function() {
   });
 
   beforeEach(function () {
-    return Folder.insertMany(folders);
+    return Promise.all([
+      Note.insertMany(notes),
+      Folder.insertMany(folders),
+      Folder.createIndexes()
+    ]);
   });
 
   afterEach(function () {
@@ -31,7 +37,7 @@ describe('Test folders API endpoints', function() {
   });
 
   describe('GET /api/folders', function() {
-    it('should return folders that match against the database', function() {
+    it.only('should return folders that match against the database', function() {
       return Promise.all([
         Folder.find(),
         chai.request(app).get('/api/folders')

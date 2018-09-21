@@ -6,8 +6,12 @@ const app = require('../server');
 const { TEST_MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
+const Folder = require('../models/folder');
+const Tag = require('../models/tag');
 
-const { notes } = require('../db/seed/notes');
+const notes = require('../db/seed/notes');
+const folders = require('../db/seed/folders');
+const tags = require('../db/seed/tags');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -19,7 +23,14 @@ describe('Test notes API endpoints', function() {
   });
 
   beforeEach(function () {
-    return Note.insertMany(notes);
+    return Promise.all([
+      Note.insertMany(notes),
+      Note.createIndexes(),
+      Folder.insertMany(folders),
+      Folder.createIndexes()
+      // Tag.insertMany(tags),
+      // Tag.createIndexes()
+    ]);
   });
 
   afterEach(function () {
@@ -46,7 +57,7 @@ describe('Test notes API endpoints', function() {
   });
 
   describe('GET /api/notes/:id', function() {
-    it('should return correct note', function () {
+    it('should return the correct note', function () {
       let data;
       // 1) First, call the database
       return Note.findOne()
@@ -60,7 +71,8 @@ describe('Test notes API endpoints', function() {
           expect(res).to.be.json;
 
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id', 'title', 'content',
+            'createdAt', 'updatedAt', 'folderId', 'tags');
 
           // 3) then compare database results to API response
           expect(res.body.id).to.equal(data.id);
@@ -91,7 +103,7 @@ describe('Test notes API endpoints', function() {
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
-          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt');
+          expect(res.body).to.have.keys('id', 'title', 'content', 'createdAt', 'updatedAt', 'tags', 'folderId');
           // 2) then call the database
           return Note.findById(res.body.id);
         })
@@ -113,7 +125,7 @@ describe('Test notes API endpoints', function() {
         .post('/api/notes')
         .send(newItem)
         .then(function(res) {
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(400);
         });
     });
 
