@@ -15,12 +15,16 @@ function validateNoteInput(title, content) {
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  const {searchTerm} = req.query;
+  const {searchTerm, folderId} = req.query;
   let filter = {};
 
   if(searchTerm) {
     const expr = RegExp(searchTerm, 'gi');
     filter = {$or: [{'title': expr}, {'content': expr}]};
+  }
+
+  if(folderId) {
+    filter.folderId = folderId;
   }
 
   Note.find(filter).sort({ updatedAt: 'desc' })

@@ -17,4 +17,4 @@ const folders = [
   }
 ];
 
-module.exports = {folders};
+module.exports = folders;
