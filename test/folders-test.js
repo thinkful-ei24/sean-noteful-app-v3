@@ -8,7 +8,7 @@ const { TEST_MONGODB_URI } = require('../config');
 const Folder = require('../models/folder');
 const Note = require('../models/note');
 
-const { folders } = require('../db/seed/folders');
+const folders = require('../db/seed/folders');
 const notes = require('../db/seed/notes');
 
 const expect = chai.expect;
@@ -22,7 +22,6 @@ describe('Test folders API endpoints', function() {
 
   beforeEach(function () {
     return Promise.all([
-      Note.insertMany(notes),
       Folder.insertMany(folders),
       Folder.createIndexes()
     ]);
