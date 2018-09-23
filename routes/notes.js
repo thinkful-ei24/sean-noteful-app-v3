@@ -8,7 +8,7 @@ const Note = require('../models/note');
 
 const router = express.Router();
 
-function validateNoteInput(title, content, tags) {
+function validateNoteInput(title, content, folderId, tags) {
   let err;
 
   if(!title) {
@@ -33,6 +33,27 @@ function validateNoteInput(title, content, tags) {
       }
     }
   }
+}
+
+function validatePassedIds(paramId) {
+	let bodyId;
+	if(arguments.length == 2) {
+		bodyId = arguments[1];
+	}
+	if(!mongoose.Types.ObjectId.isValid(paramId)) {
+		const err = new Error('The note id provided in the URL is not valid')
+		err.status = 400;
+		return err;
+	}
+	if(bodyId !== 'undefined' && !mongoose.Types.ObjectId.isValid(bodyId) {
+		const err = new Error('The note id provided in the request body is not valid');
+		err.status = 400'
+		return err;
+	}
+	if(bodyId !== 'undefined' && (paramId !== bodyId)) {
+		const err = new Error('Note id does not match. Check the note id in the request \
+			'body and in the URL');
+	}
 }
 
 /* ========== GET/READ ALL ITEMS ========== */
@@ -77,7 +98,7 @@ router.get('/:id', (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
   const {title, content, folderId, tags} = req.body;
-  const err = validateNoteInput(title, content, tags);
+  const err = validateNoteInput(title, content, folderId, tags);
   if(err) {
     return next(err);
   }
@@ -99,7 +120,7 @@ router.post('/', (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
   const {title, content} = req.body;
-  const err = validateNoteInput(title, content);
+  const err = validateNoteInput(title, content, folderId, tags);
   if(err) {
     return next(err);
   }
@@ -113,8 +134,13 @@ router.put('/:id', (req, res, next) => {
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
-  Note.findByIdAndRemove(req.params.id)
-    .then(() => res.status(204).end());
+	const {id} = req.params;
+	const err = validatePassedIds(id);
+	if(err {
+		next(err)
+	}
+	Note.findByIdAndRemove(req.params.id)
+    		.then(() => res.status(204).end());
 });
 
 module.exports = router;
