@@ -42,7 +42,7 @@ describe('Test notes API endpoints', function() {
   });
 
   describe('GET /api/notes', function() {
-    it('should return notes that match against the database', function() {
+    it('should return the same amount of notes as the databasee', function() {
       return Promise.all([
         Note.find(),
         chai.request(app).get('/api/notes')
@@ -82,6 +82,16 @@ describe('Test notes API endpoints', function() {
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
     });
+
+    it('should return 404 on an invalid id', function() {
+	return Note.findOne()
+		.then(item => {
+			return chai.request(app).get('/api/notes/' + item.id);
+		})
+		.then(result => {
+			expect(result).to.have.status(404);
+		});
+    });
   });
 
   describe('POST /api/notes', function() {
@@ -111,7 +121,10 @@ describe('Test notes API endpoints', function() {
         .then(data => {
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
-          expect(res.body.content).to.equal(data.content);
+		expect(res.body.content).to.equal(data.content);
+		expect(res.body.tags).to.be.an('array');
+		expect(res.body.tags).to.eql(data.tags);
+		expect(res.body.folderId).equal(folderId);
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
@@ -129,9 +142,31 @@ describe('Test notes API endpoints', function() {
         });
     });
 
-    // it('should not accept many notes being added in a short timespan', function() {
+    it('should not accept many notes being added in a short timespan', function() {
+	const newItem = {
+		title: 'foo',
+		content: 'bar'
+	}
+	for(let i = 0; i < 20; i++) {
+	chai.request(app)
+		.post('/api/notes')
+		.send(newItem)
+		.then(result => { 
+			expect(result).to.have.status(201);
+		});
+	}
 
-    // });
+	for(let i = 0; i < 10; i++) {
+		chai.request(app)
+			.post('/api/notes)
+			.send(newItem)
+			.then(result => {
+				expect(result).to.have.status(400);
+				expect(result.body).to.be.null;
+			});
+	}
+		
+    });
   });
   
   describe('PUT /api/notes/:id', function() {
@@ -140,9 +175,24 @@ describe('Test notes API endpoints', function() {
 
     // });
     
-    // it('should fail when the body id does not match the param id', function () {
-    
-    // });
+    it('should fail when the body id does not match the param id', function () {
+	const validIdAndContents = {
+		title: 'foobar',
+		contents: 'my new note contents',
+		id: null
+	};
+
+	let paramId;
+    	return Note.find().limit(2)
+		.then(items => {
+			validIdAndContents.id = items[0].id;
+			paramId = items[1].id;
+		})
+		.then(() = > {
+			// intentionally mismatch note ids
+			return chai.request(app).put(`/api/notes/${paramId}`).send(validIdAndContents);
+		})
+    });
     
     // 1. grab existing entry from db
     // 2. request that the item be updated through the API
@@ -173,7 +223,8 @@ describe('Test notes API endpoints', function() {
           return Note.findById(itemToUpdate.id);
         })
         .then(dbRes => {
-          // TODO
+		expect(dbRes.body.title).to.equal(newData.title);
+		expect(dbRes.body.content).to.equal(newData.content);
         });
     });
 

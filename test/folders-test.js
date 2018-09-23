@@ -36,7 +36,7 @@ describe('Test folders API endpoints', function() {
   });
 
   describe('GET /api/folders', function() {
-    it.only('should return folders that match against the database', function() {
+    it('should return folders that match against the database', function() {
       return Promise.all([
         Folder.find(),
         chai.request(app).get('/api/folders')
