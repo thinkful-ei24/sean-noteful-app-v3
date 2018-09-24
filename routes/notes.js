@@ -36,24 +36,27 @@ function validateNoteInput(title, content, folderId, tags) {
 }
 
 function validatePassedIds(paramId) {
-	let bodyId;
-	if(arguments.length == 2) {
-		bodyId = arguments[1];
-	}
-	if(!mongoose.Types.ObjectId.isValid(paramId)) {
-		const err = new Error('The note id provided in the URL is not valid')
-		err.status = 400;
-		return err;
-	}
-	if(bodyId !== 'undefined' && !mongoose.Types.ObjectId.isValid(bodyId) {
-		const err = new Error('The note id provided in the request body is not valid');
-		err.status = 400'
-		return err;
-	}
-	if(bodyId !== 'undefined' && (paramId !== bodyId)) {
-		const err = new Error('Note id does not match. Check the note id in the request \
-			'body and in the URL');
-	}
+  let bodyId;
+  if(arguments.length === 2) {
+    bodyId = arguments[1];
+  }
+  if(!mongoose.Types.ObjectId.isValid(paramId)) {
+    const err = new Error('The note id provided in the URL is not valid');
+    err.status = 404;
+    return err;
+  }
+  if(bodyId !== undefined && !mongoose.Types.ObjectId.isValid(bodyId)) {
+    console.log(bodyId);
+    const err = new Error('The note id provided in the request body is not valid');
+    err.status = 400;
+    return err;
+  }
+  if(bodyId !== undefined && (paramId !== bodyId)) {
+    const err = new Error('Note id does not match. Check the note id in the request \
+      body and in the URL');
+    err.status = 400;
+    return err;
+  }
 }
 
 /* ========== GET/READ ALL ITEMS ========== */
@@ -85,8 +88,13 @@ router.get('/', (req, res, next) => {
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
+  const {id} = req.params;
+  const err = validatePassedIds(id);
+  if(err) {
+    return next(err);
+  }
 
-  Note.findById(req.params.id)
+  Note.findById(id)
     .populate('tags')
     .populate('folderId')
     .then(result => {
@@ -119,13 +127,31 @@ router.post('/', (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
-  const {title, content} = req.body;
+  const {title, content, folderId, tags, bodyId} = req.body;
+  const {id} = req.params;
   const err = validateNoteInput(title, content, folderId, tags);
   if(err) {
     return next(err);
   }
+  const idErr = validatePassedIds(id, bodyId);
+  if(idErr) {
+    return next(err);
+  }
 
-  Note.findByIdAndUpdate(req.params.id, {title, content}, {new: true})
+  let updatedNote = {
+    title, content
+  };
+
+  // TODO: are these checks necessary?
+  if(folderId) {
+    updatedNote.folderId = folderId;
+  }
+
+  if(tags) {
+    updatedNote.tags = tags;
+  }
+
+  Note.findByIdAndUpdate(req.params.id, updatedNote, {new: true})
     .then(result => {
       return res.json(result);
     })
@@ -134,13 +160,14 @@ router.put('/:id', (req, res, next) => {
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
-	const {id} = req.params;
-	const err = validatePassedIds(id);
-	if(err {
-		next(err)
-	}
-	Note.findByIdAndRemove(req.params.id)
-    		.then(() => res.status(204).end());
+  const {id} = req.params;
+  const err = validatePassedIds(id);
+  if(err) {
+    console.log(err);
+    return next(err);
+  }
+  Note.findByIdAndRemove(req.params.id)
+    .then(() => res.status(204).end());
 });
 
 module.exports = router;
