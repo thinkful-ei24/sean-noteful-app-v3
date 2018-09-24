@@ -7,17 +7,25 @@ const express = require('express');
 const router = express.Router();
 
 router.post('/', (req, res, next) => {
-  const {username, password, fullname = ''} = req.body;
+  const {username, password, firstName, lastName} = req.body;
 
-  const newUser = {
-    username, password, fullname
-  };
-
-  User.create(newUser)
-    .then(response => {
-      return res.location(`${req.originalUrl}/${response.id}`);
+  return User.hashPassword(password)
+    .then(digest => {
+      const newUser = {
+        username,
+        password: digest,
+        fullname: firstName + ' ' + lastName
+      };
+      return User.create(newUser);
     })
-    .catch(err => next(err));
+    .then(result => {
+      return res.status(201).location(`/api/users/${result.id}`).json(result);
+    })
+    .catch(err => {
+      err = new Error('The username already exists');
+      err.status = 400;
+      next(err);
+    });
 });
 
 module.exports = router;

@@ -11,6 +11,10 @@ const notesRouter = require('./routes/notes');
 const foldersRouter = require('./routes/folders');
 const tagsRouter = require('./routes/tags');
 const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth.js');
+
+const passport = require('passport');
+const localStrategy = require('./passport/local');
 
 // Create an Express application
 const app = express();
@@ -34,6 +38,9 @@ app.use('/api/folders', foldersRouter);
 app.use('/api/tags', tagsRouter);
 
 app.use('/api/users', usersRouter);
+
+passport.use(localStrategy);
+app.use('/api/login', authRouter);
 
 // Custom 404 Not Found route handler
 app.use((req, res, next) => {

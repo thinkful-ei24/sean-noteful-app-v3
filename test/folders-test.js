@@ -51,7 +51,7 @@ describe('Test folders API endpoints', function() {
   });
 
   describe('GET /api/folders/:id', function() {
-    it('should return correct folder', function () {
+    it.only('should return correct folder', function () {
       let data;
       // 1) First, call the database
       return Folder.findOne()
