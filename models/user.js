@@ -7,6 +7,10 @@ const schema = new mongoose.Schema({
   password: {type: String, required:true}
 });
 
+schema.methods.validatePassword = function (password) {
+  return password === this.password;
+};
+
 schema.set('toObject', {
   virtuals: true,
   versionKey: false,
