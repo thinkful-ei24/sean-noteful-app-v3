@@ -1,3 +1,41 @@
+const folders = [
+  {
+    "_id": "111111111111111111111100",
+    "name": "Archive"
+  },
+  {
+    "_id": "111111111111111111111101",
+    "name": "Drafts"
+  },
+  {
+    "_id": "111111111111111111111102",
+    "name": "Personal"
+  },
+  {
+    "_id": "111111111111111111111103",
+    "name": "Work"
+  }
+];
+
+const tags = [
+  {
+    "_id": "222222222222222222222200",
+    "name": "breed"
+  },
+  {
+    "_id": "222222222222222222222201",
+    "name": "hybrid"
+  },
+  {
+    "_id": "222222222222222222222202",
+    "name": "domestic"
+  },
+  {
+    "_id": "222222222222222222222203",
+    "name": "feral"
+  }
+];
+
 const notes = [
   {
     '_id': '000000000000000000000000',
@@ -57,4 +95,4 @@ const notes = [
   }
 ];
 
-module.exports = notes;
+module.exports = {notes, tags, folders};

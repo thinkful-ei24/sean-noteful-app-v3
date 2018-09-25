@@ -10,7 +10,7 @@ const app = require('../server');
 const Tag = require('../models/tag');
 const Note = require('../models/note');
 const Folder = require('../models/folder');
-const { folders, notes, tags } = require('../db/data');
+const { folders, notes, tags } = require('../db/seed-data');
 const { TEST_MONGODB_URI } = require('../config');
 
 chai.use(chaiHttp);

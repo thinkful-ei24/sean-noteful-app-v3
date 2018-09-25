@@ -9,7 +9,7 @@ const sinon = require('sinon');
 const app = require('../server');
 const Folder = require('../models/folder');
 const Note = require('../models/note');
-const { folders, notes } = require('../db/data');
+const { folders, notes } = require('../db/seed-data');
 const { TEST_MONGODB_URI } = require('../config');
 
 chai.use(chaiHttp);

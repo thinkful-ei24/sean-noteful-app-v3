@@ -8,7 +8,7 @@ const Note = require('../models/note');
 
 const router = express.Router();
 
-title, content, folderId, tags
+// title, content, folderId, tags
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
