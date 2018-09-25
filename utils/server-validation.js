@@ -12,7 +12,7 @@ const middleware = {
     }
   },
 
-  validateObjectIdArray: (objectIds) => {
+  validateObjectIdArray: (objectIds) => (req, res, next) => {
     for(let id of objectIds) {
       if(!mongoose.Types.ObjectId.isValid(id)) {
         const err = new Error('A tag id is not valid');
@@ -32,7 +32,6 @@ const middleware = {
 
   validateBodyId: (req, res, next) => {
     if(!mongoose.Types.ObjectId.isValid(req.body.id)) {
-      console.log(bodyId);
       const err = new Error('The note id provided in the request body is not valid');
       err.status = 400;
       return err;

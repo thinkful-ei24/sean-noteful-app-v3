@@ -1,12 +1,14 @@
 'use strict';
 
-const express = require('express');
 
 const mongoose = require('mongoose');
-
 const Note = require('../models/note');
 
+const express = require('express');
 const router = express.Router();
+
+const {requireFields, validateParamAndBodyId,
+      validateParamId, validateObjectIdArray} = require('../utils/server-validation');
 
 // title, content, folderId, tags
 
@@ -38,12 +40,8 @@ router.get('/', (req, res, next) => {
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
-  const err = validatePassedIds(id);
-  if(err) {
-    return next(err);
-  }
 
   Note.findById(id)
     .populate('tags')
@@ -55,12 +53,8 @@ router.get('/:id', (req, res, next) => {
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', (req, res, next) => {
+router.post('/', requireFields(['title', 'content', 'folderId', 'tags']), (req, res, next) => {
   const {title, content, folderId, tags} = req.body;
-  const err = validateNoteInput(title, content, folderId, tags);
-  if(err) {
-    return next(err);
-  }
 
   const newNote = {
     title,
