@@ -7,9 +7,10 @@ const middleware = {
       if(!field) {
         const err = new Error(`Missing \`${field}\` in request body`);
         err.status = 400;
-        return err;
+        return next(err);
       }
     }
+    return next();
   },
 
   validateObjectIdArray: (objectIds) => (req, res, next) => {
@@ -17,25 +18,28 @@ const middleware = {
       if(!mongoose.Types.ObjectId.isValid(id)) {
         const err = new Error('A tag id is not valid');
         err.status = 400;
-        return err;
+        return next(err);
       }
     }
+    return next();
   },
 
   validateParamId: (req, res, next) => {
     if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
       const err = new Error('The note id provided in the URL is not valid');
       err.status = 404;
-      return err;
+      return next(err);
     }
+    return next();
   },
 
   validateBodyId: (req, res, next) => {
     if(!mongoose.Types.ObjectId.isValid(req.body.id)) {
       const err = new Error('The note id provided in the request body is not valid');
       err.status = 400;
-      return err;
+      return next(err);
     }
+    return next();
   },
 
   validateParamAndBodyId: (req, res, next) => {
@@ -47,9 +51,10 @@ const middleware = {
         const err = new Error('Note id does not match. Check the note id in the request \
           body and in the URL');
         err.status = 400;
-        return err;
+        return next(err);
       }
     }
+    return next();
   }
 };
 
