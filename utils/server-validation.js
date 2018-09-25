@@ -1,56 +1,57 @@
 
 const mongoose = require('mongoose');
 
-function validateInput(reqFields) {
-  for(field of reqFields) {
-    if()
-  }
-  let err;
+const middleware = {
+  requireFields: (reqFields) => (req, res, next) => {
+    for(let field of reqFields) {
+      if(!field) {
+        const err = new Error(`Missing \`${field}\` in request body`);
+        err.status = 400;
+        return err;
+      }
+    }
+  },
 
-  if(!title) {
-    err = new Error('Missing `title` in request body');
-    err.status = 400;
-    return err;
-  }
-  
-  if (!content) {
-    err = new Error('Missing `content` in request body');
-    err.status = 400;
-    return err;
-  }
-
-  console.log(tags);
-  if(tags) {
-    for(let tagId of tags) {
-      if(!mongoose.Types.ObjectId.isValid(tagId)) {
+  validateObjectIdArray: (objectIds) => {
+    for(let id of objectIds) {
+      if(!mongoose.Types.ObjectId.isValid(id)) {
         const err = new Error('A tag id is not valid');
         err.status = 400;
         return err;
       }
     }
-  }
-}
+  },
 
-function validatePassedIds(paramId) {
-  let bodyId;
-  if(arguments.length === 2) {
-    bodyId = arguments[1];
+  validateParamId: (req, res, next) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      const err = new Error('The note id provided in the URL is not valid');
+      err.status = 404;
+      return err;
+    }
+  },
+
+  validateBodyId: (req, res, next) => {
+    if(!mongoose.Types.ObjectId.isValid(req.body.id)) {
+      console.log(bodyId);
+      const err = new Error('The note id provided in the request body is not valid');
+      err.status = 400;
+      return err;
+    }
+  },
+
+  validateParamAndBodyId: (req, res, next) => {
+    // check to see if both ids are valid
+    if(this.validateParamId(req, res, next)
+      && this.validateBodyId(req, res, next)) {
+      // check to see if they match
+      if(req.params.id !== req.body.id) {
+        const err = new Error('Note id does not match. Check the note id in the request \
+          body and in the URL');
+        err.status = 400;
+        return err;
+      }
+    }
   }
-  if(!mongoose.Types.ObjectId.isValid(paramId)) {
-    const err = new Error('The note id provided in the URL is not valid');
-    err.status = 404;
-    return err;
-  }
-  if(bodyId !== undefined && !mongoose.Types.ObjectId.isValid(bodyId)) {
-    console.log(bodyId);
-    const err = new Error('The note id provided in the request body is not valid');
-    err.status = 400;
-    return err;
-  }
-  if(bodyId !== undefined && (paramId !== bodyId)) {
-    const err = new Error('Note id does not match. Check the note id in the request \
-      body and in the URL');
-    err.status = 400;
-    return err;
-  }
-}
+};
+
+module.exports = middleware;
