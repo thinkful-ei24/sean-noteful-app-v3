@@ -17,7 +17,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   const {searchTerm, folderId, tagId} = req.query;
-  const {userId} = req.user;
+  const {id: userId} = req.user;
 
   let filter = { userId };
 
@@ -46,9 +46,9 @@ router.get('/', (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
-  const {userId} = req.user;
+  const {id: userId} = req.user;
 
-  return Note.find({_id: id,)
+  return Note.find({_id: id, userId})
     .populate('tags')
     .populate('folderId')
     .then(result => {
@@ -61,10 +61,12 @@ router.get('/:id', validateParamId, (req, res, next) => {
 router.post('/', requireFields(['title', 'content', 'folderId', 'tags']),
   validateTagIds, validateFolderId, (req, res, next) => {
     const {title, content, folderId, tags} = req.body;
+    const {id: userId} = req.user;
 
     const newNote = {
       title,
       content,
+      userId,
       folderId: folderId ? folderId : null,
       tags: tags ? tags : []
     };
@@ -81,6 +83,7 @@ router.put('/:id', requireFields(['title', 'content', 'folderId', 'tags'],
   validateFolderId, validateTagIds, validateParamAndBodyId), (req, res, next) => {
   const {title, content, folderId, tags} = req.body;
   const {id} = req.params;
+  const {id: userId} = req.user;
 
   let updatedNote = {
     title, content
@@ -95,7 +98,7 @@ router.put('/:id', requireFields(['title', 'content', 'folderId', 'tags'],
     updatedNote.tags = tags;
   }
 
-  return Note.findByIdAndUpdate(id, updatedNote, {new: true})
+  return Note.findOneAndUpdate({_id: id, userId}, updatedNote, {new: true})
     .then(result => {
       return res.json(result);
     })
@@ -104,7 +107,8 @@ router.put('/:id', requireFields(['title', 'content', 'folderId', 'tags'],
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', validateParamId, (req, res, next) => {
-  return Note.findByIdAndRemove(req.params.id)
+  const {id: userId} = req.user;
+  return Note.findOneAndRemove({_id: req.params.id, userId})
     .then(() => res.status(204).end());
 });
 
