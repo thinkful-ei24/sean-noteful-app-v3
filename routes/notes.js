@@ -17,7 +17,9 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   const {searchTerm, folderId, tagId} = req.query;
-  let filter = {};
+  const {userId} = req.user;
+
+  let filter = { userId };
 
   if(searchTerm) {
     const expr = RegExp(searchTerm, 'gi');
@@ -44,8 +46,9 @@ router.get('/', (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
+  const {userId} = req.user;
 
-  return Note.findById(id)
+  return Note.find({_id: id,)
     .populate('tags')
     .populate('folderId')
     .then(result => {

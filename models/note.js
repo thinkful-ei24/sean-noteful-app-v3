@@ -4,8 +4,11 @@ const noteSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: String,
   folderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Folder'},
-  tags: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tag'}]
+  tags: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tag'}],
+  userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true}
 });
+
+noteSchema.index({name:1, userId: 1}, {unique: true});
 
 // Add `createdAt` and `updatedAt` fields
 noteSchema.set('timestamps', true);
