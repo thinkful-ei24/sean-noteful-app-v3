@@ -7,6 +7,10 @@ const router = express.Router();
 
 const {requireFields, validateParamId, validateParamAndBodyId} = require('../utils/server-validation');
 
+const passport = require('passport');
+
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
+
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   return Tag.find().sort({ name: 'desc' })

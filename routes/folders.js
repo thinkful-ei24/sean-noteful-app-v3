@@ -7,8 +7,12 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
+const passport = require('passport');
+
 const {requireFields, validateParamAndBodyId, validateParamId}
   = require('../utils/server-validation');
+
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 router.get('/', (req, res, next) => {
   return Folder.find().sort({name: 'desc'})
