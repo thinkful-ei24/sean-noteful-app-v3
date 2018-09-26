@@ -15,7 +15,8 @@ const {requireFields, validateParamAndBodyId, validateParamId}
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 router.get('/', (req, res, next) => {
-  return Folder.find().sort({name: 'desc'})
+  const {id: userId} = req.user;
+  return Folder.findById(userId).sort({name: 'desc'})
     .then(results => {
       res.json(results);
     })
@@ -24,8 +25,8 @@ router.get('/', (req, res, next) => {
 
 router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
-
-  return Folder.findOne({_id: id})
+  const {id: userId} = req.user;
+  return Folder.findOne({_id: id, userId})
     .then(result => {
       return res.json(result);
     })
@@ -33,7 +34,8 @@ router.get('/:id', validateParamId, (req, res, next) => {
 });
 
 router.put('/:id', requireFields(['name']), validateParamAndBodyId, (req, res, next) => {
-  return Folder.findByIdAndUpdate(req.params.id, {name}, {new: true})
+  const {id: userId} = req.user;
+  return Folder.findOneAndUpdate({_id: req.params.id, userId}, {name}, {new: true})
     .then(result => {
       return res.json(result);
     })
@@ -41,7 +43,8 @@ router.put('/:id', requireFields(['name']), validateParamAndBodyId, (req, res, n
 });
 
 router.post('/', requireFields(['name']), (req, res, next) => {
-  return Folder.create({name})
+  const {id: userId} = req.user;
+  return Folder.create({name, userId})
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
@@ -49,7 +52,8 @@ router.post('/', requireFields(['name']), (req, res, next) => {
 });
 
 router.delete('/:id', validateParamId, (req, res) => {
-  return Folder.findByIdAndRemove(req.params.id)
+  const {id: userId} = req.user;
+  return Folder.findOneAndRemove({_id: req.params.id, userId})
     .then(() => res.status(204).end());
 });
 
