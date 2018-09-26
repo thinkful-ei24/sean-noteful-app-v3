@@ -31,7 +31,7 @@ router.get('/', (req, res, next) => {
   }
 
   if(tagId) {
-    filter.tagId = tagId;
+    filter.tags = tagId;
   }
 
   return Note.find(filter).sort({ updatedAt: 'desc' })
@@ -58,7 +58,7 @@ router.get('/:id', validateParamId, (req, res, next) => {
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', requireFields(['title', 'content', 'folderId', 'tags']),
+router.post('/', requireFields(['title', 'content']),
   validateTagIds, validateFolderId, (req, res, next) => {
     const {title, content, folderId, tags} = req.body;
     const {id: userId} = req.user;

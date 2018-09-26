@@ -13,7 +13,8 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  return Tag.find().sort({ name: 'desc' })
+  const {id: userId} = req.user;
+  return Tag.find({userId}).sort({ name: 'desc' })
     .then(results => {
       res.json(results);
     })
@@ -22,7 +23,8 @@ router.get('/', (req, res, next) => {
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', validateParamId, (req, res, next) => {
-  return Tag.findById(req.params.id)
+  const {id: userId} = req.user;
+  return Tag.findOne({_id: req.params.id, userId})
     .then(result => {
       if(!result) {
         return next();
@@ -35,7 +37,8 @@ router.get('/:id', validateParamId, (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', requireFields(['name']), (req, res, next) => {
-  return Tag.create({name})
+  const {id: userId} = req.user;
+  return Tag.create({name, userId})
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
@@ -44,7 +47,8 @@ router.post('/', requireFields(['name']), (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', requireFields(['name']), validateParamAndBodyId, (req, res, next) => {
-  return Tag.findByIdAndUpdate(req.params.id, {name}, {new: true})
+  const {id: userId} = req.user;
+  return Tag.findOneAndUpdate({_id: req.params.id, userId}, {name}, {new: true})
     .then(result => {
       return res.json(result);
     })
@@ -53,7 +57,8 @@ router.put('/:id', requireFields(['name']), validateParamAndBodyId, (req, res, n
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', validateParamId, (req, res, next) => {
-  return Tag.findByIdAndRemove(req.params.id)
+  const {id: userId} = req.user;
+  return Tag.findOneAndRemove({_id: req.params.id, userId})
     .then(() => res.status(204).end());
 });
 
