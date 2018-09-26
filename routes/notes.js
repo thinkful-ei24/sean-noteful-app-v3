@@ -7,8 +7,8 @@ const Note = require('../models/note');
 const express = require('express');
 const router = express.Router();
 
-const {requireFields, validateParamAndBodyId,
-      validateParamId, validateObjectIdArray} = require('../utils/server-validation');
+const {requireFields, validateParamAndBodyId, validateFolderId,
+  validateParamId, validateTagIds} = require('../utils/server-validation');
 
 // title, content, folderId, tags
 
@@ -30,7 +30,7 @@ router.get('/', (req, res, next) => {
     filter.tagId = tagId;
   }
 
-  Note.find(filter).sort({ updatedAt: 'desc' })
+  return Note.find(filter).sort({ updatedAt: 'desc' })
     .populate('tags')
     .populate('folderId')
     .then(results => {
@@ -43,7 +43,7 @@ router.get('/', (req, res, next) => {
 router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
 
-  Note.findById(id)
+  return Note.findById(id)
     .populate('tags')
     .populate('folderId')
     .then(result => {
@@ -53,35 +53,29 @@ router.get('/:id', validateParamId, (req, res, next) => {
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', requireFields(['title', 'content', 'folderId', 'tags']), (req, res, next) => {
-  const {title, content, folderId, tags} = req.body;
+router.post('/', requireFields(['title', 'content', 'folderId', 'tags']),
+  validateTagIds, validateFolderId, (req, res, next) => {
+    const {title, content, folderId, tags} = req.body;
 
-  const newNote = {
-    title,
-    content,
-    folderId: folderId ? folderId : null,
-    tags: tags ? tags : []
-  };
+    const newNote = {
+      title,
+      content,
+      folderId: folderId ? folderId : null,
+      tags: tags ? tags : []
+    };
 
-  Note.create(newNote)
-    .then(result => {
-      return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
-    })
-    .catch(err => next(err));
+    return Note.create(newNote)
+      .then(result => {
+        return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+      })
+      .catch(err => next(err));
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', (req, res, next) => {
-  const {title, content, folderId, tags, bodyId} = req.body;
+router.put('/:id', requireFields(['title', 'content', 'folderId', 'tags'],
+  validateFolderId, validateTagIds, validateParamAndBodyId), (req, res, next) => {
+  const {title, content, folderId, tags} = req.body;
   const {id} = req.params;
-  const err = validateNoteInput(title, content, folderId, tags);
-  if(err) {
-    return next(err);
-  }
-  const idErr = validatePassedIds(id, bodyId);
-  if(idErr) {
-    return next(err);
-  }
 
   let updatedNote = {
     title, content
@@ -96,7 +90,7 @@ router.put('/:id', (req, res, next) => {
     updatedNote.tags = tags;
   }
 
-  Note.findByIdAndUpdate(req.params.id, updatedNote, {new: true})
+  return Note.findByIdAndUpdate(id, updatedNote, {new: true})
     .then(result => {
       return res.json(result);
     })
@@ -104,14 +98,8 @@ router.put('/:id', (req, res, next) => {
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
-router.delete('/:id', (req, res, next) => {
-  const {id} = req.params;
-  const err = validatePassedIds(id);
-  if(err) {
-    console.log(err);
-    return next(err);
-  }
-  Note.findByIdAndRemove(req.params.id)
+router.delete('/:id', validateParamId, (req, res, next) => {
+  return Note.findByIdAndRemove(req.params.id)
     .then(() => res.status(204).end());
 });
 

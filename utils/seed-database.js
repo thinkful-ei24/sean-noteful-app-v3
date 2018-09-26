@@ -17,7 +17,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
     ]);
   })
   .then(results => {
-    console.log('Inserted:')
+    console.log('Inserted:');
     console.log(results[0].length.toString(), 'notes');
     console.log(results[1].length.toString(), 'folders');
     console.log(results[2].length.toString(), 'tags');

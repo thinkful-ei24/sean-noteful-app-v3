@@ -7,56 +7,45 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
+const {requireFields, validateParamAndBodyId, validateParamId}
+  = require('../utils/server-validation');
+
 router.get('/', (req, res, next) => {
-  Folder.find().sort({name: 'desc'})
+  return Folder.find().sort({name: 'desc'})
     .then(results => {
       res.json(results);
     })
     .catch(err => next(err));
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
 
-  Folder.findOne({_id: id})
+  return Folder.findOne({_id: id})
     .then(result => {
       return res.json(result);
     })
     .catch(err => next(err));
 });
 
-router.put('/:id', (req, res, next) => {
-  const {name} = req.body;
-  if(!name) {
-    const err = new Error('Folder name not specified');
-    err.status = 400;
-    return next(err);
-  }
-
-  Folder.findByIdAndUpdate(req.params.id, {name}, {new: true})
+router.put('/:id', requireFields(['name']), validateParamAndBodyId, (req, res, next) => {
+  return Folder.findByIdAndUpdate(req.params.id, {name}, {new: true})
     .then(result => {
       return res.json(result);
     })
     .catch(err => next(err));
 });
 
-router.post('/', (req, res, next) => {
-  const {name} = req.body;
-  if(!name) {
-    const err = new Error('Folder name not specified');
-    err.status = 400;
-    return next(err);
-  }
-
-  Folder.create({name})
+router.post('/', requireFields(['name']), (req, res, next) => {
+  return Folder.create({name})
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
     .catch(err => next(err));
 });
 
-router.delete('/:id', (req, res, next) => {
-  Folder.findByIdAndRemove(req.params.id)
+router.delete('/:id', validateParamId, (req, res) => {
+  return Folder.findByIdAndRemove(req.params.id)
     .then(() => res.status(204).end());
 });
 

@@ -7,7 +7,7 @@ const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  Tag.find().sort({ name: 'desc' })
+  return Tag.find().sort({ name: 'desc' })
     .then(results => {
       res.json(results);
     })
@@ -16,7 +16,7 @@ router.get('/', (req, res, next) => {
 
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', (req, res, next) => {
-  Tag.findById(req.params.id)
+  return Tag.findById(req.params.id)
     .then(result => {
       if(!result) {
         return next();
@@ -35,7 +35,7 @@ router.post('/', (req, res, next) => {
     err.status = 400;
   }
 
-  Tag.create({name})
+  return Tag.create({name})
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
@@ -50,7 +50,7 @@ router.put('/:id', (req, res, next) => {
     err.status = 400;
   }
 
-  Tag.findByIdAndUpdate(req.params.id, {name}, {new: true})
+  return Tag.findByIdAndUpdate(req.params.id, {name}, {new: true})
     .then(result => {
       return res.json(result);
     })
@@ -58,8 +58,8 @@ router.put('/:id', (req, res, next) => {
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
-router.delete('/:id', (req, res, next) => {
-  Tag.findByIdAndRemove(req.params.id)
+router.delete('/:id', validateParamId, (req, res, next) => {
+  return Tag.findByIdAndRemove(req.params.id)
     .then(() => res.status(204).end());
 });
 

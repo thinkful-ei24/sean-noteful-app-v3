@@ -30,6 +30,8 @@ app.use(express.static('public'));
 // Parse request body
 app.use(express.json());
 
+// TODO MOUNT AUTH HERE
+
 // Mount routers
 app.use('/api/notes', notesRouter);
 

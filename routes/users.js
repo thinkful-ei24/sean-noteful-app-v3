@@ -6,6 +6,7 @@ const User = require('../models/user');
 const express = require('express');
 const router = express.Router();
 
+const 
 router.post('/', (req, res, next) => {
   const {username, password, firstName, lastName} = req.body;
 
