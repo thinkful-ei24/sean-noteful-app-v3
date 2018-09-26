@@ -35,7 +35,7 @@ passport.use(localStrategy);
 passport.use(jwtStrategy);
 
 app.use('/api/users', usersRouter);
-app.use('/api/auth', authRouter);
+app.use('/api/login', authRouter);
 
 // Mount routers
 app.use('/api/notes', notesRouter);

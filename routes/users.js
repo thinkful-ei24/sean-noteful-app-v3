@@ -8,15 +8,15 @@ const router = express.Router();
 
 const {requireFields} = require('../utils/server-validation');
 
-router.post('/', requireFields(['username','password','firstName','lastName']), (req, res, next) => {
-  const {username, password, firstName, lastName} = req.body;
+router.post('/', requireFields(['username','password','fullname']), (req, res, next) => {
+  const {username, password, fullname} = req.body;
 
   return User.hashPassword(password)
     .then(digest => {
       const newUser = {
         username,
         password: digest,
-        fullname: firstName + ' ' + lastName
+        fullname
       };
       return User.create(newUser);
     })

@@ -16,7 +16,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 router.get('/', (req, res, next) => {
   const {id: userId} = req.user;
-  return Folder.findById(userId).sort({name: 'desc'})
+  return Folder.find({userId}).sort({name: 'desc'})
     .then(results => {
       res.json(results);
     })
@@ -54,7 +54,10 @@ router.post('/', requireFields(['name']), (req, res, next) => {
 router.delete('/:id', validateParamId, (req, res) => {
   const {id: userId} = req.user;
   return Folder.findOneAndRemove({_id: req.params.id, userId})
-    .then(() => res.status(204).end());
+    .then(() => res.status(204).end())
+    .catch(err => {
+      
+    })
 });
 
 module.exports = router;

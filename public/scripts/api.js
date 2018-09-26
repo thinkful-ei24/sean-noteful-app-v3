@@ -1,7 +1,5 @@
-/* global $ */
+/* global $ store */
 'use strict';
-
-const store = require('./store');
 
 const api = (function () {
   const search = function(path, query) {
