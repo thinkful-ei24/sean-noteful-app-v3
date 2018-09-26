@@ -6,8 +6,9 @@ const User = require('../models/user');
 const express = require('express');
 const router = express.Router();
 
-const 
-router.post('/', (req, res, next) => {
+const {requireFields} = require('../utils/server-validation');
+
+router.post('/', requireFields(['username','password','firstName','lastName']), (req, res, next) => {
   const {username, password, firstName, lastName} = req.body;
 
   return User.hashPassword(password)

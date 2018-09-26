@@ -5,6 +5,8 @@ const Tag = require('../models/tag');
 
 const router = express.Router();
 
+const {requireFields, validateParamId, validateParamAndBodyId} = require('../utils/server-validation');
+
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   return Tag.find().sort({ name: 'desc' })
@@ -15,7 +17,7 @@ router.get('/', (req, res, next) => {
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', validateParamId, (req, res, next) => {
   return Tag.findById(req.params.id)
     .then(result => {
       if(!result) {
@@ -28,13 +30,7 @@ router.get('/:id', (req, res, next) => {
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', (req, res, next) => {
-  const {name} = req.body;
-  if(!name) {
-    const err = new Error('Missing `name` in request body');
-    err.status = 400;
-  }
-
+router.post('/', requireFields(['name']), (req, res, next) => {
   return Tag.create({name})
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
@@ -43,13 +39,7 @@ router.post('/', (req, res, next) => {
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', (req, res, next) => {
-  const {name} = req.body;
-  if(!name) {
-    const err = new Error('Missing `name` in request body');
-    err.status = 400;
-  }
-
+router.put('/:id', requireFields(['name']), validateParamAndBodyId, (req, res, next) => {
   return Tag.findByIdAndUpdate(req.params.id, {name}, {new: true})
     .then(result => {
       return res.json(result);
