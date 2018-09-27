@@ -5,8 +5,6 @@ const Folder = require('../models/folder');
 
 const router = express.Router();
 
-const mongoose = require('mongoose');
-
 const passport = require('passport');
 
 const {requireFields, validateParamAndBodyId, validateParamId}
