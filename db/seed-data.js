@@ -69,6 +69,14 @@ const notes = [
     folderId: '222222222222222222222202',
     tags: ['333333333333333333333302', '333333333333333333333306', '333333333333333333333308'],
     userId: '000000000000000000000002'
+  },
+  // test entry
+  {
+    _id: '111111111111111111111110',
+    title: '5 life lessons learned from cats',
+    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    userId: '000000000000000000000002',
+    folderId: null
   }
 ];
 

@@ -48,24 +48,29 @@ router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
   const {id: userId} = req.user;
   
-  return Note.find({_id: id, userId})
+  return Note.findOne({_id: id, userId})
     .populate('tags')
     .populate('folderId')
     .then(result => {
+      if(!result) {
+        const err = new Error('Note id does not exist');
+        err.status = 404;
+        return next(err);
+      }
       return res.json(result);
     })
     .catch(err => next(err));
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', requireFields(['title', 'content']),
+router.post('/', requireFields(['title']),
   validateTagIds, validateFolderId, (req, res, next) => {
     const {title, content, folderId, tags} = req.body;
     const {id: userId} = req.user;
 
     const newNote = {
       title,
-      content,
+      content: content ? content : '',
       userId,
       folderId: folderId ? folderId : null,
       tags: tags ? tags : []
@@ -79,7 +84,7 @@ router.post('/', requireFields(['title', 'content']),
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', requireFields(['title', 'content', 'folderId', 'tags'],
+router.put('/:id', requireFields(['title', 'content', 'tags'],
   validateFolderId, validateTagIds, validateParamAndBodyId), (req, res, next) => {
   const {title, content, folderId, tags} = req.body;
   const {id} = req.params;
