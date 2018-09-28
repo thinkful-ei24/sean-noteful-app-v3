@@ -52,7 +52,7 @@ const middleware = {
   validateParamId: (req, res, next) => {
     if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
       const err = new Error('The note id provided in the URL is not valid');
-      err.status = 404;
+      err.status = 400;
       return next(err);
     }
     return next();

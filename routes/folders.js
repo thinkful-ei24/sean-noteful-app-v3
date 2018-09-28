@@ -2,6 +2,7 @@
 const express = require('express');
 
 const Folder = require('../models/folder');
+const Note = require('../models/note');
 
 const router = express.Router();
 
@@ -70,10 +71,14 @@ router.post('/', requireFields(['name']), (req, res, next) => {
     });
 });
 
-router.delete('/:id', validateParamId, (req, res) => {
+router.delete('/:id', validateParamId, (req, res, next) => {
   const {id: userId} = req.user;
-  return Folder.findOneAndRemove({_id: req.params.id, userId})
-    .then(() => res.status(204).end());
+  Promise.all([
+    Folder.findOneAndRemove({_id: req.params.id, userId}),
+    Note.updateMany({folderId: req.params.id, userId}, {$unset: {folderId: null}})
+  ])
+    .then(() => res.status(204).end())
+    .catch(err => next(err));
 });
 
 module.exports = router;
