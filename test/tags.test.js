@@ -9,7 +9,8 @@ const sinon = require('sinon');
 const app = require('../server');
 const Tag = require('../models/tag');
 const Note = require('../models/note');
-const { notes, tags } = require('../db/seed-data');
+const User = require('../models/user');
+const { notes, tags, users } = require('../db/seed-data');
 const { TEST_MONGODB_URI } = require('../config');
 
 chai.use(chaiHttp);
@@ -21,6 +22,7 @@ describe('Noteful API - Tags', function () {
   before(function () {
     return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
       .then(() => Promise.all([
+        User.deleteMany(),
         Note.deleteMany(),
         Tag.deleteMany(),
       ]));
@@ -28,6 +30,7 @@ describe('Noteful API - Tags', function () {
 
   beforeEach(function () {
     return Promise.all([
+      User.insertMany(users),
       Tag.insertMany(tags),
       Note.insertMany(notes)
     ]);
@@ -36,6 +39,7 @@ describe('Noteful API - Tags', function () {
   afterEach(function () {
     sandbox.restore();
     return Promise.all([
+      User.deleteMany(),
       Note.deleteMany(),
       Tag.deleteMany(),
     ]);

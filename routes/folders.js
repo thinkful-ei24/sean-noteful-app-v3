@@ -14,7 +14,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 router.get('/', (req, res, next) => {
   const {id: userId} = req.user;
-  return Folder.find({userId}).sort({name: 'desc'})
+  return Folder.find({userId}).sort('name')
     .then(results => {
       res.json(results);
     })
@@ -33,29 +33,47 @@ router.get('/:id', validateParamId, (req, res, next) => {
 
 router.put('/:id', requireFields(['name']), validateParamAndBodyId, (req, res, next) => {
   const {id: userId} = req.user;
+  const {name} = req.body;
   return Folder.findOneAndUpdate({_id: req.params.id, userId}, {name}, {new: true})
     .then(result => {
+      if(!result) {
+        const err = new Error('Could not find folder with the given id');
+        err.status = 404;
+        return next(err);
+      }
       return res.json(result);
     })
-    .catch(err => next(err));
+    .catch(err => {
+      if(err.code === 11000) {
+        err = new Error('Folder name already exists');
+        err.status = 400;
+        return next(err);
+      }
+      next(err);
+    });
 });
 
 router.post('/', requireFields(['name']), (req, res, next) => {
+  const {name} = req.body;
   const {id: userId} = req.user;
   return Folder.create({name, userId})
     .then(result => {
       return res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
-    .catch(err => next(err));
+    .catch(err => {
+      if(err.code === 11000) {
+        err = new Error('Folder name already exists');
+        err.status = 400;
+        return next(err);
+      }
+      return next(err);
+    });
 });
 
 router.delete('/:id', validateParamId, (req, res) => {
   const {id: userId} = req.user;
   return Folder.findOneAndRemove({_id: req.params.id, userId})
-    .then(() => res.status(204).end())
-    .catch(err => {
-      
-    })
+    .then(() => res.status(204).end());
 });
 
 module.exports = router;

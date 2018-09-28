@@ -9,6 +9,11 @@ const middleware = {
         err.status = 400;
         return next(err);
       }
+      if(req.body[field] === '') {
+        const err = new Error(`Missing \`${field}\` in request body`);
+        err.status = 400;
+        return next(err);
+      }
     }
     return next();
   },
@@ -43,6 +48,7 @@ const middleware = {
     return next();
   },
 
+  // TODO: remove
   validateParamId: (req, res, next) => {
     if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
       const err = new Error('The note id provided in the URL is not valid');
@@ -52,6 +58,7 @@ const middleware = {
     return next();
   },
 
+  // TODO: remove
   validateBodyId: (req, res, next) => {
     if(!mongoose.Types.ObjectId.isValid(req.body.id)) {
       const err = new Error('The note id provided in the request body is not valid');
@@ -62,19 +69,36 @@ const middleware = {
   },
 
   validateParamAndBodyId: (req, res, next) => {
-    // check to see if both ids are valid
-    if(this.validateParamId(req, res, next)
-      && this.validateBodyId(req, res, next)) {
-      // check to see if they match
-      if(req.params.id !== req.body.id) {
-        const err = new Error('Note id does not match. Check the note id in the request \
-          body and in the URL');
+    const {id: bodyId} = req.body;
+    const {id: paramId} = req.params;
+
+    if(bodyId) {
+      if(!mongoose.Types.ObjectId.isValid(req.body.id)) {
+        const err = new Error('The id is not valid');
         err.status = 400;
         return next(err);
       }
     }
+
+    if(paramId) {
+      if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        const err = new Error('The id is not valid');
+        err.status = 400;
+        return next(err);
+      }
+    }
+
+    if((paramId && bodyId) && (paramId !== bodyId)) {
+      const err = new Error('Note id does not match. Check the note id in the request \
+        body and in the URL');
+      err.status = 400;
+      return next(err);
+    }
+
     return next();
   }
+
+  
 };
 
 module.exports = middleware;

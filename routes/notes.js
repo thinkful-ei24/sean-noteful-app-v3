@@ -47,7 +47,7 @@ router.get('/', (req, res, next) => {
 router.get('/:id', validateParamId, (req, res, next) => {
   const {id} = req.params;
   const {id: userId} = req.user;
-
+  
   return Note.find({_id: id, userId})
     .populate('tags')
     .populate('folderId')

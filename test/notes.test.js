@@ -10,6 +10,7 @@ const app = require('../server');
 const Tag = require('../models/tag');
 const Note = require('../models/note');
 const Folder = require('../models/folder');
+const User = require('../models/user');
 const { folders, notes, tags } = require('../db/seed-data');
 const { TEST_MONGODB_URI } = require('../config');
 
@@ -39,6 +40,7 @@ describe('Noteful API - Notes', function () {
   afterEach(function () {
     sandbox.restore();
     return Promise.all([
+      Users.deleteMany(),
       Note.deleteMany(),
       Folder.deleteMany(),
       Tag.deleteMany(),
